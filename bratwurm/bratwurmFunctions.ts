@@ -53,7 +53,7 @@ function* exampleNextStateGen(state: BratwurmState): IterableIterator<BratwurmSt
 }
 
 console.log('prob of fehlwurf: ', probabilityOfFehlwurf({
-    thrown: {diceCount: [0, 0, 0, 0, 0, 7], probability: 1},
+    thrown: {diceCount: [0, 1, 1, 1, 1, 3], probability: 1},
     fehlWurf: false
 }));
 
