@@ -23,6 +23,9 @@ export function getNextThrow(curr: Throw): Throw {
 
 export function probabilityOf(diceCount: number[]): number {
     const total = sum(...diceCount);
+    if (total <= 0) {
+        return 0;
+    }
     let remainingDiceCount = total;
     let possibilities = 1;
     console.debug('diceCount: ', diceCount);
@@ -42,6 +45,8 @@ export function* getAllThrows(diceCount: number): IterableIterator<Throw> {
         yield current;
         current = getNextThrow(current);
     } while (current.diceCount[0] < diceCount);
-    yield current;
+    if (diceCount > 0) {
+        yield current;
+    }
     return undefined;
 }

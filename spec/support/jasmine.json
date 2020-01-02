@@ -1,7 +1,8 @@
 {
-  "spec_dir": "bratwurm",
+  "spec_dir": "",
   "spec_files": [
-    "**/*[sS]pec.js"
+    "bratwurm/**/*[sS]pec.js",
+    "dice/**/*[sS]pec.js"
   ],
   "helpers": [
     "helpers/**/*.js"

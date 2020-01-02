@@ -52,11 +52,6 @@ function* exampleNextStateGen(state: BratwurmState): IterableIterator<BratwurmSt
     return;
 }
 
-console.log('prob of fehlwurf: ', probabilityOfFehlwurf({
-    thrown: {diceCount: [0, 1, 1, 1, 1, 3], probability: 1},
-    fehlWurf: false
-}));
-
 /*let i = 0;
 for (const wurf of getAllThrows(2)) {
     console.log('wurf: ', i++, wurf);
