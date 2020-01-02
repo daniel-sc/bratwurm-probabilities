@@ -12,6 +12,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
     - name: Compile
-      run: ./node_modules/.bin/ts
+      run: ./node_modules/.bin/tsc
     - name: Test
       run: npm test
