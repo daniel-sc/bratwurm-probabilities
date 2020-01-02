@@ -1,4 +1,5 @@
 import {getSum, prob, probabilityOfFehlwurf} from './bratwurmFunctions';
+import * as math from 'mathjs';
 
 describe('bratwurmFunctions', () => {
     describe('probabilityOfFehlwurf', () => {
@@ -33,20 +34,44 @@ describe('bratwurmFunctions', () => {
 
     describe('prob', () => {
         it('should return 0 for too high sum', () => {
-            expect(prob(21, {thrown: {diceCount: [0, 0, 0, 0, 0, 5], probability: 1}, fehlWurf: false})).toEqual(0);
-            expect(prob(21, {thrown: {diceCount: [0, 0, 0, 0, 5, 0], probability: 1}, fehlWurf: false})).toEqual(0);
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [0, 0, 0, 0, 0, 5], probability: 1},
+                fehlWurf: false
+            }))).toEqual('0');
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [0, 0, 0, 0, 5, 0], probability: 1},
+                fehlWurf: false
+            }))).toEqual('0');
         });
         it('should return 0 for fehlwurf', () => {
-            expect(prob(21, {thrown: {diceCount: [0, 0, 0, 0, 0, 1], probability: 1}, fehlWurf: true})).toEqual(0);
-            expect(prob(21, {thrown: {diceCount: [0, 0, 0, 0, 1, 0], probability: 1}, fehlWurf: true})).toEqual(0);
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [0, 0, 0, 0, 0, 1], probability: 1},
+                fehlWurf: true
+            }))).toEqual('0');
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [0, 0, 0, 0, 1, 0], probability: 1},
+                fehlWurf: true
+            }))).toEqual('0');
         });
         it('should return 0 if all dice used', () => {
-            expect(prob(21, {thrown: {diceCount: [7, 0, 0, 0, 0, 1], probability: 1}, fehlWurf: false})).toEqual(0);
-            expect(prob(21, {thrown: {diceCount: [7, 0, 0, 0, 1, 0], probability: 1}, fehlWurf: false})).toEqual(0);
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [7, 0, 0, 0, 0, 1], probability: 1},
+                fehlWurf: false
+            }))).toEqual('0');
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [7, 0, 0, 0, 1, 0], probability: 1},
+                fehlWurf: false
+            }))).toEqual('0');
         });
         it('should return 1 if sum matches', () => {
-            expect(prob(21, {thrown: {diceCount: [1, 0, 0, 0, 0, 4], probability: 1}, fehlWurf: false})).toEqual(1);
-            expect(prob(21, {thrown: {diceCount: [1, 0, 0, 0, 4, 0], probability: 1}, fehlWurf: false})).toEqual(1);
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [1, 0, 0, 0, 0, 4], probability: 1},
+                fehlWurf: false
+            }))).toEqual('1');
+            expect(math.string(prob(21, {
+                thrown: {diceCount: [1, 0, 0, 0, 4, 0], probability: 1},
+                fehlWurf: false
+            }))).toEqual('1');
         });
         // https://www.omnicalculator.com/statistics/dice?v=dice_type:6,target_value2:0,target_value3:0,number_of_dice:3,game_option:4.000000000000000,target_value1:1,target_dice:1
         it('should return correct simple recursive value', () => {
@@ -60,7 +85,7 @@ describe('bratwurmFunctions', () => {
             expect(prob(21, {
                 thrown: {diceCount: [0, 0, 0, 0, 0, 0], probability: 1},
                 fehlWurf: false
-            })).toBeCloseTo(0.1);
+            })).toBeCloseTo(0.4951502336);
         });
     });
 });

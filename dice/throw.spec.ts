@@ -1,4 +1,5 @@
 import {getAllThrows, probabilityOf} from './throw';
+import {fraction} from 'mathjs';
 
 describe('throw', () => {
 
@@ -11,7 +12,7 @@ describe('throw', () => {
 
     describe('getAllThrows', () => {
         it('should return correct value for 0 dice count', () => {
-            expect([...getAllThrows(0)]).toEqual([{diceCount: [0, 0, 0, 0, 0, 0], probability: 0}]);
+            expect([...getAllThrows(0)]).toEqual([{diceCount: [0, 0, 0, 0, 0, 0], probability: fraction(0)}]);
         });
     });
 

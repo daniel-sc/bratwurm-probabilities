@@ -1,17 +1,17 @@
 import {BratwurmState, serializeBratwurmState} from './bratwurmState';
-import {sum} from 'mathjs';
+import {add, fraction, Fraction, MathType, max, multiply, sum} from 'mathjs';
 import {DICE_FACES, getAllThrows, Throw} from '../dice/throw';
 
 
 export const TOTAL_DICES = 8;
 
-export function probabilityOfFehlwurf(state: BratwurmState) {
-    const stateWithProb100 = {...state, thrown: {...state.thrown, probability: 1}};
-    let fehlwurfProb = 0;
+export function probabilityOfFehlwurf(state: BratwurmState): Fraction {
+    const stateWithProb100: BratwurmState = {...state, thrown: {...state.thrown, probability: fraction(1) as Fraction}};
+    let fehlwurfProb: Fraction = fraction(0) as Fraction;
     for (const nextState of exampleNextStateGen(stateWithProb100)) {
         console.debug('next state: ', nextState);
         if (nextState.fehlWurf) {
-            fehlwurfProb += nextState.thrown.probability;
+            fehlwurfProb = add(fehlwurfProb, nextState.thrown.probability) as Fraction;
         }
     }
     return fehlwurfProb;
@@ -30,14 +30,17 @@ function* getNextStateForThrow(state: BratwurmState, wurf: Throw): IterableItera
             fehlWurf = false;
             yield {
                 ...state,
-                thrown: {diceCount: newThrown, probability: state.thrown.probability * wurf.probability}, // TODO these probs cannot be summed!
+                thrown: {
+                    diceCount: newThrown,
+                    probability: multiply(state.thrown.probability, wurf.probability)
+                }, // TODO these probs cannot be summed!
             }
         }
     }
     if (fehlWurf) {
         yield {
             ...state,
-            thrown: {...state.thrown, probability: state.thrown.probability * wurf.probability},
+            thrown: {...state.thrown, probability: multiply(state.thrown.probability, wurf.probability)},
             fehlWurf: true
         };
     }
@@ -63,11 +66,9 @@ export function getSum(diceCount: number[]): number {
     return diceCount.reduce((acc, curr, i) => acc + (i < 5 ? i + 1 : 5) * curr, 0)
 }
 
-// TODO 'at least'..
-// TODO precision?
-export function prob(target: number, state: BratwurmState, cache?: Map<string, number>): number {
+export function prob(target: number, state: BratwurmState, cache?: Map<string, Fraction>): MathType {
     if (!cache) {
-        cache = new Map<string, number>();
+        cache = new Map<string, Fraction>();
     }
     const stateKey = serializeBratwurmState(state);
     if (!cache.has(stateKey)) {
@@ -85,9 +86,10 @@ export function prob(target: number, state: BratwurmState, cache?: Map<string, n
         }
 
         const remainingDice = TOTAL_DICES - diceUsed;
-        let probTotal = 0;
+        let probTotal: Fraction = fraction(0) as Fraction;
         for (const wurf of getAllThrows(remainingDice)) {
-            probTotal += wurf.probability * Math.max(...([...getNextStateForThrow(state, wurf)].map(s => prob(target, s, cache))));
+            const maxProbability: Fraction = max(...([...getNextStateForThrow(state, wurf)].map(s => prob(target, s, cache))));
+            probTotal = sum(probTotal, multiply(wurf.probability, maxProbability) as Fraction) as Fraction;
         }
         cache.set(stateKey, probTotal);
         console.debug('result: ', probTotal);

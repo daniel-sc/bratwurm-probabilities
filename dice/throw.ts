@@ -1,10 +1,10 @@
-import {combinations, pow, sum} from 'mathjs';
+import {combinations, Fraction, fraction, MathType, pow, sum} from 'mathjs';
 
 export const DICE_FACES = 6;
 
 export interface Throw {
     diceCount: number[];
-    probability: number;
+    probability: MathType;
 }
 
 /** throws are ordered lexicographically: 002, 011, 020, 110, .. */
@@ -21,10 +21,10 @@ export function getNextThrow(curr: Throw): Throw {
 }
 
 
-export function probabilityOf(diceCount: number[]): number {
+export function probabilityOf(diceCount: number[]): Fraction {
     const total = sum(...diceCount);
     if (total <= 0) {
-        return 0;
+        return fraction(0) as Fraction;
     }
     let remainingDiceCount = total;
     let possibilities = 1;
@@ -34,7 +34,7 @@ export function probabilityOf(diceCount: number[]): number {
         possibilities *= combinations(remainingDiceCount, count) as number;
         remainingDiceCount -= count;
     });
-    return possibilities / <number>pow(DICE_FACES, total);
+    return fraction(possibilities, <number>pow(DICE_FACES, total)) as Fraction;
 }
 
 export function* getAllThrows(diceCount: number): IterableIterator<Throw> {
