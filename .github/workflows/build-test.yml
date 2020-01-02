@@ -1,0 +1,17 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: npm ci
+    - name: Compile
+      run: ./node_modules/.bin/ts
+    - name: Test
+      run: npm test
