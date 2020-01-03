@@ -1,0 +1,12 @@
+image: node:10
+
+
+cache:
+  paths:
+    - node_modules/
+
+build_and_test:
+  script:
+    - npm ci
+    - ./node_modules/.bin/tsc
+    - npm test
