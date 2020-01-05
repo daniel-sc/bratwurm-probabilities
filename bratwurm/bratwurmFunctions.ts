@@ -63,6 +63,14 @@ function* exampleNextStateGen(state: BratwurmState): IterableIterator<BratwurmSt
     }
 }
 
+export function* situations(): IterableIterator<Throw> {
+    for (let diceCount = 0; diceCount < TOTAL_DICES; diceCount++) {
+        for (const t of getAllThrows(diceCount)) {
+            yield t;
+        }
+    }
+}
+
 export function getSum(diceCount: number[]): number {
     return diceCount.reduce((acc, curr, i) => acc + (i < 5 ? i + 1 : 5) * curr, 0)
 }
