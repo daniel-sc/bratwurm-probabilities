@@ -3,3 +3,5 @@ node_modules/
 *.iml
 *.js
 *.js.map
+*.csv
+*.txt
