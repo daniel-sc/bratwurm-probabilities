@@ -1,10 +1,10 @@
-import {combinations, Fraction, fraction, MathType, pow, sum} from 'mathjs';
+import {combinations, Fraction, fraction, pow, sum} from 'mathjs';
 
 export const DICE_FACES = 6;
 
 export interface Throw {
     diceCount: number[];
-    probability: MathType;
+    probability: Fraction | number;
 }
 
 /** throws are ordered lexicographically: 002, 011, 020, 110, .. */

@@ -1,20 +1,21 @@
 {
-  "name": "general-state-search",
+  "name": "bratwurm-probabilities",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "build": "tsc"
   },
+  "sideEffects": false,
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mathjs": "~6.2.5"
+    "mathjs": "~11.5.0"
   },
   "devDependencies": {
     "@types/jasmine": "^3.5.0",
-    "@types/mathjs": "~6.0.2",
     "@types/node": "^13.1.2",
     "jasmine": "^3.5.0",
     "typescript": "~3.7.4"

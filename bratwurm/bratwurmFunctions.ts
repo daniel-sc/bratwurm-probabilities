@@ -1,5 +1,5 @@
 import {BratwurmState, serializeBratwurmState} from './bratwurmState';
-import {add, fraction, Fraction, MathType, max, multiply, sum} from 'mathjs';
+import {add, fraction, Fraction, larger, max, multiply, number, sum} from 'mathjs';
 import {DICE_FACES, getAllThrows, Throw} from '../dice/throw';
 
 
@@ -10,7 +10,7 @@ export function probabilityOfFehlwurf(state: BratwurmState): Fraction {
     const stateWithProb100: BratwurmState = {...state, thrown: {...state.thrown, probability: fraction(1) as Fraction}};
     let fehlwurfProb: Fraction = fraction(0) as Fraction;
     for (const nextState of exampleNextStateGen(stateWithProb100)) {
-        console.debug('next state: ', nextState);
+        // console.debug('next state: ', nextState);
         if (nextState.fehlWurf) {
             fehlwurfProb = add(fehlwurfProb, nextState.thrown.probability) as Fraction;
         }
@@ -24,8 +24,8 @@ function* getNextStateForThrow(state: BratwurmState, wurf: Throw): IterableItera
     for (let d = 0; d < DICE_FACES; d++) {
         if (state.thrown.diceCount[d] === 0 && wurf.diceCount[d] > 0 &&
             /* fehlwurf wenn kein bratwurm mehr moeglich: */(d === DICE_FACES - 1 || state.thrown.diceCount[DICE_FACES - 1] > 0 || wurf.diceCount[d] < remainingDice)) {
-            console.debug('state: ', state);
-            console.debug('throw:', wurf);
+            // console.debug('state: ', state);
+            // console.debug('throw:', wurf);
             const newThrown = [...state.thrown.diceCount];
             newThrown[d] = wurf.diceCount[d];
             fehlWurf = false;
@@ -33,7 +33,7 @@ function* getNextStateForThrow(state: BratwurmState, wurf: Throw): IterableItera
                 ...state,
                 thrown: {
                     diceCount: newThrown,
-                    probability: multiply(state.thrown.probability, wurf.probability)
+                    probability: multiply(state.thrown.probability, wurf.probability) as (Fraction | number)
                 }, // TODO these probs cannot be summed!
             }
         }
@@ -41,7 +41,10 @@ function* getNextStateForThrow(state: BratwurmState, wurf: Throw): IterableItera
     if (fehlWurf) {
         yield {
             ...state,
-            thrown: {...state.thrown, probability: multiply(state.thrown.probability, wurf.probability)},
+            thrown: {
+                ...state.thrown,
+                probability: multiply(state.thrown.probability, wurf.probability) as (Fraction | number)
+            },
             fehlWurf: true
         };
     }
@@ -54,9 +57,9 @@ function* exampleNextStateGen(state: BratwurmState): IterableIterator<BratwurmSt
         return;
     }
     const remainingDice = TOTAL_DICES - alreadyThrown;
-    console.debug('remainingDice: ', remainingDice);
+    // console.debug('remainingDice: ', remainingDice);
     for (const wurf of getAllThrows(remainingDice)) {
-        console.debug('wurf: ', wurf);
+        // console.debug('wurf: ', wurf);
         for (const next of getNextStateForThrow(state, wurf)) {
             yield next;
         }
@@ -75,7 +78,7 @@ export function getSum(diceCount: number[]): number {
     return diceCount.reduce((acc, curr, i) => acc + (i < 5 ? i + 1 : 5) * curr, 0)
 }
 
-export function probAtLeast(target: number, state: BratwurmState, cache?: Map<string, Fraction>) {
+export function probAtLeast(target: number, state: BratwurmState, cache?: Map<string, Fraction>): Fraction | number {
     return prob(target, state, finalState => {
         const currentSum = getSum(finalState.thrown.diceCount);
         const diceUsed = sum(...finalState.thrown.diceCount);
@@ -113,13 +116,13 @@ export function probExact(target: number, state: BratwurmState, cache?: Map<stri
  * @param terminate return `null` to indicate non final state
  * @param cache
  */
-export function prob(target: number, state: BratwurmState, terminate: (state: BratwurmState) => MathType | null, cache?: Map<string, Fraction>): MathType {
+export function prob(target: number, state: BratwurmState, terminate: (state: BratwurmState) => Fraction | number | null, cache?: Map<string, Fraction>): Fraction | number {
     if (!cache) {
         cache = new Map<string, Fraction>();
     }
     const stateKey = serializeBratwurmState(state);
     if (!cache.has(stateKey)) {
-        console.debug('computing for state: ', stateKey);
+        // console.debug('computing for state: ', stateKey);
         const terminalResult = terminate(state);
         if (terminalResult !== null) {
             return terminalResult;
@@ -131,7 +134,25 @@ export function prob(target: number, state: BratwurmState, terminate: (state: Br
             probTotal = sum(probTotal, multiply(wurf.probability, maxProbability) as Fraction) as Fraction;
         }
         cache.set(stateKey, probTotal);
-        console.debug('result: ', probTotal);
+        // console.debug('result: ', probTotal);
     }
     return cache.get(stateKey)!;
+}
+
+export function* computeProbs(sumF: boolean): IterableIterator<{ diceCounts: number[], probs: number[] }> {
+    const caches = new Map<number, Map<string, Fraction>>();
+    TARGETS.forEach(t => caches.set(t, new Map<string, Fraction>()));
+
+    const probFunction = sumF ? probAtLeast : probExact;
+
+    for (const t of situations()) {
+        const probs = TARGETS.map(target => probFunction(target, {
+            thrown: t,
+            fehlWurf: false
+        }, caches.get(target)) as Fraction);
+        if (larger(sum(...probs), 0)) { // only non-trivial results
+            yield {diceCounts: t.diceCount, probs: probs.map(p => number(p) as number)};
+
+        }
+    }
 }
