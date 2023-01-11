@@ -1,0 +1,5 @@
+*.spec.ts
+spec/**
+.gitlab-ci.yml
+.github/**
+tsconfig.json

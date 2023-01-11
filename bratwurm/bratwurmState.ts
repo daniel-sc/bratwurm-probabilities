@@ -1,7 +1,6 @@
-import {State} from '../state';
 import {Throw} from '../dice/throw';
 
-export interface BratwurmState extends State {
+export interface BratwurmState {
     thrown: Throw;
     fehlWurf: boolean;
 }
