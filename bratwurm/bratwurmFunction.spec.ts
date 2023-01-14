@@ -1,5 +1,5 @@
 import {getSum, probabilityOfFehlwurf, probAtLeast, probExact} from './bratwurmFunctions';
-import * as math from 'mathjs';
+import {string} from 'mathjs';
 import {BratwurmState} from './bratwurmState';
 
 function getState(diceCount: number[], fehlwurf = false): BratwurmState {
@@ -33,50 +33,56 @@ describe('bratwurmFunctions', () => {
 
     describe('probExact', () => {
         it('should return 0 for too high sum', () => {
-            expect(math.string(probExact(21, getState([0, 0, 0, 0, 0, 5])))).toEqual('0');
-            expect(math.string(probExact(21, getState([0, 0, 0, 0, 5, 0])))).toEqual('0');
+            expect(string(probExact(21, getState([0, 0, 0, 0, 0, 5])))).toEqual('0');
+            expect(string(probExact(21, getState([0, 0, 0, 0, 5, 0])))).toEqual('0');
         });
         it('should return 0 for fehlwurf', () => {
-            expect(math.string(probExact(21, getState([0, 0, 0, 0, 0, 1], true)))).toEqual('0');
-            expect(math.string(probExact(21, getState([0, 0, 0, 0, 1, 0], true)))).toEqual('0');
+            expect(string(probExact(21, getState([0, 0, 0, 0, 0, 1], true)))).toEqual('0');
+            expect(string(probExact(21, getState([0, 0, 0, 0, 1, 0], true)))).toEqual('0');
         });
         it('should return 0 if all dice used', () => {
-            expect(math.string(probExact(21, getState([7, 0, 0, 0, 0, 1])))).toEqual('0');
-            expect(math.string(probExact(21, getState([7, 0, 0, 0, 1, 0])))).toEqual('0');
+            expect(string(probExact(21, getState([7, 0, 0, 0, 0, 1])))).toEqual('0');
+            expect(string(probExact(21, getState([7, 0, 0, 0, 1, 0])))).toEqual('0');
         });
-        it('should return 1 if sum matches', () => {
-            expect(math.string(probExact(21, getState([1, 0, 0, 0, 0, 4])))).toEqual('1');
-            expect(math.string(probExact(21, getState([1, 0, 0, 0, 4, 0])))).toEqual('1');
+        it('should return 1 if sum matches and contains bratwurm', () => {
+            expect(string(probExact(21, getState([1, 0, 0, 0, 0, 4])))).toEqual('1');
+        });
+        it('should return 0 if sum matches but does not contain bratwurm', () => {
+            expect(string(probExact(21, getState([1, 0, 0, 0, 4, 0])))).toEqual('0');
         });
         // https://www.omnicalculator.com/statistics/dice?v=dice_type:6,target_value2:0,target_value3:0,number_of_dice:3,game_option:4.000000000000000,target_value1:1,target_dice:1
         it('should return correct simple recursive value', () => {
-            expect(probExact(21, getState([0, 0, 0, 0, 0, 4]))).toBeCloseTo(0.3858);
+            expect(probExact(21, getState([0, 0, 0, 0, 0, 4]))).toBeCloseTo(0.3858025);
         });
         it('should return correct recursive value', () => {
             console.debug = () => null;
-            expect(probExact(21, getState([0, 0, 0, 0, 0, 0]))).toBeCloseTo(0.4951502336);
+            expect(probExact(21, getState([0, 0, 0, 0, 0, 0]))).toBeCloseTo(0.439596789623015);
         });
     });
 
     describe('probAtLeast', () => {
-        it('should return 1 for too high sum', () => {
-            expect(math.string(probAtLeast(21, getState([0, 0, 0, 0, 0, 5])))).toEqual('1');
-            expect(math.string(probAtLeast(21, getState([0, 0, 0, 0, 5, 0])))).toEqual('1');
+        it('should return 1 for too high sum if bratwurm is contained', () => {
+            expect(string(probAtLeast(21, getState([0, 0, 0, 0, 0, 5])))).toEqual('1');
+        });
+        it('should return < 1 for too high sum if bratwurm is not contained', () => {
+            expect(probAtLeast(21, getState([0, 0, 0, 0, 7, 0]))).toBeCloseTo(1/6);
         });
         it('should return 0 if all dice used', () => {
-            expect(math.string(probAtLeast(21, getState([7, 0, 0, 0, 0, 1])))).toEqual('0');
-            expect(math.string(probAtLeast(21, getState([7, 0, 0, 0, 1, 0])))).toEqual('0');
+            expect(string(probAtLeast(21, getState([7, 0, 0, 0, 0, 1])))).toEqual('0');
+            expect(string(probAtLeast(21, getState([7, 0, 0, 0, 1, 0])))).toEqual('0');
         });
-        it('should return 1 if sum matches', () => {
-            expect(math.string(probAtLeast(21, getState([1, 0, 0, 0, 0, 4])))).toEqual('1');
-            expect(math.string(probAtLeast(21, getState([1, 0, 0, 0, 4, 0])))).toEqual('1');
+        it('should return 1 if sum matches and bratwurm contained', () => {
+            expect(string(probAtLeast(21, getState([1, 0, 0, 0, 0, 4])))).toEqual('1');
+        });
+        it('should return < 1 if sum matches and bratwurm not contained', () => {
+            expect(probAtLeast(21, getState([1, 0, 0, 0, 4, 0]))).toBeLessThan(1);
         });
         it('should return correct simple recursive value', () => {
             expect(probAtLeast(21, getState([0, 0, 0, 0, 0, 4]))).toBeCloseTo(0.9992);
         });
         it('should return correct recursive value', () => {
             console.debug = () => null;
-            expect(probAtLeast(21, getState([0, 0, 0, 0, 0, 0]))).toBeCloseTo(0.9380313106);
+            expect(probAtLeast(21, getState([0, 0, 0, 0, 0, 0]))).toBeCloseTo(0.893026737150746);
         });
     });
 });

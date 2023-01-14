@@ -85,7 +85,7 @@ export function probAtLeast(target: number, state: BratwurmState, cache?: Map<st
         if (finalState.fehlWurf || (diceUsed === TOTAL_DICES && currentSum < target)) {
             return 0;
         }
-        if (currentSum >= target) {
+        if (currentSum >= target && finalState.thrown.diceCount[5] > 0) {
             return 1;
         }
         return null;
@@ -100,7 +100,7 @@ export function probExact(target: number, state: BratwurmState, cache?: Map<stri
         if (finalState.fehlWurf || currentSum > target) {
             return 0;
         }
-        if (currentSum === target) {
+        if (currentSum === target && finalState.thrown.diceCount[5] > 0) {
             return 1;
         }
         if (diceUsed === TOTAL_DICES) {
