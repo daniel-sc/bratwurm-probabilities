@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mathjs": "~11.5.0"
+    "mathjs": "~15.2.0"
   },
   "devDependencies": {
     "@types/jasmine": "^4.3.1",
